@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const http = require('http');
 const WebSocket = require('ws');
+const cors = require('cors');
 const RED = require('node-red');
 
 const app = express();
@@ -19,6 +20,13 @@ const settings = {
 RED.init(server, settings);
 app.use(settings.httpAdminRoot, RED.httpAdmin);
 app.use(settings.httpNodeRoot, RED.httpNode);
+
+// CORS configuration
+app.use(cors({
+    origin: 'https://voltmeter.senani.me',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type']
+}));
 
 // Mongoose configuration
 const mongoUri = "mongodb+srv://janithakarunarathna12:E3OUigKBJAVPHgAi@voltmeterv1.vxefnw8.mongodb.net/VoltmeterV1?retryWrites=true&w=majority";
@@ -57,7 +65,7 @@ wss.on('connection', (ws) => {
     };
 
     // Send data every 30 seconds
-    const interval = setInterval(sendReadings, 15000);
+    const interval = setInterval(sendReadings, 30000);
 
     ws.on('close', () => {
         clearInterval(interval);
@@ -67,7 +75,7 @@ wss.on('connection', (ws) => {
 
 const PORT = process.env.PORT || 1880;
 server.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}/red`);
+    console.log(`Server running on https://voltmeterback.onrender.com`);
 });
 
 RED.start();
